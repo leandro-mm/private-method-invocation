@@ -1,29 +1,98 @@
 using FluentAssertions;
-using Microsoft.VisualBasic.ApplicationServices;
-using PrivateMethodAccess.Authorization;
-using System.Security.Claims;
+using PrivateMethodAccess;
 
 namespace TestProject1
 {
     public class UnitTest1
     {
-        [Fact]
-        public void TestUnauthenticatedUser()
+        private FormSecureService _form;
+        public UnitTest1()
         {
-            //var user = TestClaimsPrincipalFactory.CreateUnauthenticatedUser();
-            //var provider = new SecureActionProvider(user);
-            //var action = provider.GetAuthorizedAction();
-            //var result = action();
+            _form = new FormSecureService();
+        }
 
+        [Fact]
+        public void Test_Admin_User()
+        {
+            // Arrange            
+            var user = TestClaimsPrincipalFactory.CreateAdminUser();
+            var role = TestClaimsPrincipalFactory.GetClaimRole(user);           
+
+            // Act
+            Action action = () => _form.GetAuthorizedDelegate(role);
+                        
+            // Assert
+            action.Should().NotThrow();
+        }
+
+        [Fact]
+        public void Test_Unauthenticated_User()
+        {
             // Arrange            
             var user = TestClaimsPrincipalFactory.CreateUnauthenticatedUser();
-            var provider = new SecureActionProvider(user);
+            var role = TestClaimsPrincipalFactory.GetClaimRole(user);
 
-            // Act            
-            Delegate authDelegate = provider.GetAuthorizedAction();
+            // Act
+            Action action = () => _form.GetAuthorizedDelegate(role);
 
             // Assert
-            
+            action.Should().Throw();
+        }
+
+        [Fact]
+        public void Test_Regular_User()
+        {
+            // Arrange            
+            var user = TestClaimsPrincipalFactory.CreateRegularUser();
+            var role = TestClaimsPrincipalFactory.GetClaimRole(user);
+
+            // Act
+            Action action = () => _form.GetAuthorizedDelegate(role);
+
+            // Assert
+            action.Should().Throw();
+        }
+
+        [Fact]
+        public void Test_User_With_Permission()
+        {
+            // Arrange            
+            var user = TestClaimsPrincipalFactory.CreateUserWithPermission("Admin");
+            var role = TestClaimsPrincipalFactory.GetClaimRole(user);
+
+            // Act
+            Action action = () => _form.GetAuthorizedDelegate(role);
+
+            // Assert
+            action.Should().Throw();
+        }
+
+        [Fact]
+        public void Test_Multi_Role_User()
+        {
+            // Arrange            
+            var user = TestClaimsPrincipalFactory.CreateMultiRoleUser();
+            var role = TestClaimsPrincipalFactory.GetClaimRole(user);
+
+            // Act
+            Action action = () => _form.GetAuthorizedDelegate(role);
+
+            // Assert
+            action.Should().Throw();
+        }
+
+        [Fact]
+        public void Test_Null_User()
+        {
+            // Arrange            
+            var user = TestClaimsPrincipalFactory.CreateNullUser();
+            var role = TestClaimsPrincipalFactory.GetClaimRole(user);
+
+            // Act
+            Action action = () => _form.GetAuthorizedDelegate(role);
+
+            // Assert
+            action.Should().Throw();
         }
     }
 

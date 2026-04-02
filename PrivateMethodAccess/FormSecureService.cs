@@ -18,23 +18,21 @@ public partial class FormSecureService: Form
         return "Sensitive operation executed with success.";
     }
 
-    public AuthorizedAction GetAuthorizedDelegate(string callerId)
+    public AuthorizedAction GetAuthorizedDelegate(string? role)
     {
-        if (IsAuthorized(callerId))
+        if (IsAuthorized(role))
         {
             return PerformSecureAction;
         }
         else
         {
-            throw new UnauthorizedAccessException($"Access denied for caller: {callerId}");
+            throw new UnauthorizedAccessException($"Access denied for caller: {role}");
         }
     }
 
-    private bool IsAuthorized(string role)
+    private bool IsAuthorized(string? role)
     {
-        // Simulated authorization logic
-        //var authorizedCallers = new HashSet<string> { "Admin", "TrustedService" };
-        //return authorizedCallers.Contains(callerId);
+        // Simulated authorization logic  
 
         string username = "AdminUser";
         var claims = new List<Claim>
@@ -52,7 +50,20 @@ public partial class FormSecureService: Form
         var roleClaim = claimsPrincipal.Claims
             .FirstOrDefault(c => c.Type == ClaimTypes.Role);
 
-        return roleClaim != null && roleClaim.Value == role;
+        return role != null && roleClaim?.Value == role;
+
+        // Check if user exists and is authenticated
+        //if (_user?.Identity == null || !_user.Identity.IsAuthenticated) return false;
+
+        // Option 1: Check for specific role return _user.IsInRole("Admin") || _user.IsInRole("SecureRole");
+
+        // Check for specific claim  return _user.HasClaim(c => c.Type == "Permission" && c.Value == "AccessSecureAction");
+
+        // More complex example with multiple conditions
+        // return _user.Identity.IsAuthenticated &&  (_user.IsInRole("Admin") ||  _user.HasClaim(c => c.Type == "SecureAccessLevel" && int.Parse(c.Value) >= 3));
+
+        //  Simple authenticated check (any logged-in user) return true;
+
     }
 
     private void button1_Click(object sender, EventArgs e)

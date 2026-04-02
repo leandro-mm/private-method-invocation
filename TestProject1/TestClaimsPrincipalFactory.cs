@@ -74,4 +74,10 @@ public static class TestClaimsPrincipalFactory
     {
         return null;
     }
+
+    public static string? GetClaimRole(ClaimsPrincipal? user)
+    {
+        var userClaim = user?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+        return userClaim?.Value;
+    }
 }
