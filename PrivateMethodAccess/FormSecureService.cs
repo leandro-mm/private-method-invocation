@@ -4,7 +4,7 @@ namespace PrivateMethodAccess;
 
 public partial class FormSecureService: Form
 {
-    public delegate void AuthorizedAction();
+    public delegate string AuthorizedAction();
 
     public FormSecureService()
     {
@@ -12,23 +12,21 @@ public partial class FormSecureService: Form
     }
 
     // Private method we want to protect
-    private void PerformSecureAction()
+    private string PerformSecureAction()
     {
-        textBox1.Text = $"Sensitive operation executed with success.";
-    }        
+        return "Sensitive operation executed with success.";
+    }
 
-    // Public method that returns a delegate only to authorized callers
     public AuthorizedAction GetAuthorizedDelegate(string callerId)
     {
         if (IsAuthorized(callerId))
         {
-            // Return a delegate pointing to the private method
             return PerformSecureAction;
         }
         else
         {
             throw new UnauthorizedAccessException($"Access denied for caller: {callerId}");
-        }  
+        }
     }
 
     private bool IsAuthorized(string callerId)
@@ -45,12 +43,12 @@ public partial class FormSecureService: Form
         try
         {
             var callerId = comboBox1.SelectedItem?.ToString() ?? string.Empty;
-            var AuthorizedAction = GetAuthorizedDelegate(callerId);
-            AuthorizedAction();
+            var authorizedAction = GetAuthorizedDelegate(callerId);
+            textBox1.Text = authorizedAction();
+
         }
         catch (Exception ex)
         {
-
             textBox1.Text = ex.Message;
         }
     }

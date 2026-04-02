@@ -5,6 +5,8 @@ namespace PrivateMethodAccess.Authorization;
 public class SecureActionProvider
 {
     private readonly ClaimsPrincipal _user;
+    
+    public delegate string AuthorizedAction();
 
     private bool IsUserAuthorized
     {
@@ -14,7 +16,7 @@ public class SecureActionProvider
         }
     }
 
-    public delegate string AuthorizedAction();
+    
 
     public SecureActionProvider(ClaimsPrincipal user)
     {
